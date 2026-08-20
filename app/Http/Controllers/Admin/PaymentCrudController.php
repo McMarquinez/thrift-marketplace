@@ -84,7 +84,7 @@ class PaymentCrudController extends CrudController
             'expired' => 'expired',
             'refunded' => 'refunded',
         ]);
-        CRUD::field('paid_at')->type('datetime_picker');
+        CRUD::field('paid_at')->type('datetime');
         CRUD::field('metadata')->type('textarea')->hint('Store JSON payload for gateway references or notes.');
     }
 

@@ -98,7 +98,7 @@ class OrderCrudController extends CrudController
             'shipped' => 'shipped',
             'delivered' => 'delivered',
         ]);
-        CRUD::field('expires_at')->type('datetime_picker');
+        CRUD::field('expires_at')->type('datetime');
         CRUD::field('notes')->type('textarea');
     }
 

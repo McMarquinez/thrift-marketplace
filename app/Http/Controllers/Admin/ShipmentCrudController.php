@@ -82,8 +82,8 @@ class ShipmentCrudController extends CrudController
             'shipped' => 'shipped',
             'delivered' => 'delivered',
         ]);
-        CRUD::field('shipped_at')->type('datetime_picker');
-        CRUD::field('delivered_at')->type('datetime_picker');
+        CRUD::field('shipped_at')->type('datetime');
+        CRUD::field('delivered_at')->type('datetime');
     }
 
     /**
