@@ -11,64 +11,96 @@
 </head>
 <body class="storefront-body">
 <div id="storefrontApp" class="storefront-shell">
-    <header class="store-header">
-        <p class="store-title">THRIFTMARKET</p>
-        <div class="divider"></div>
-        <div class="store-nav-row">
-            <nav class="store-nav" aria-label="Main links">
-                <a href="#justIn">Shop</a>
-                <a href="#newDrops">New Drops</a>
-                <a href="#about">About</a>
-            </nav>
-            <a class="cart-link" href="#cartNotice">Cart <span id="cartCount" class="cart-count">0</span></a>
-        </div>
+    <header class="site-navbar">
+        <a href="{{ route('storefront.home') }}" class="brand-block">
+            <span class="brand-mark">TM</span>
+            <div>
+                <p class="brand-title">THRIFTMARKET</p>
+                <p class="brand-sub">Curated thrift discovery</p>
+            </div>
+        </a>
+        <nav class="navbar-links" aria-label="Main navigation">
+            <a href="#catalog">Shop</a>
+            <a href="#newDrops">New Drops</a>
+            <a href="#about">About</a>
+        </nav>
+        <a class="cart-link" href="{{ route('storefront.cart') }}">Cart <span id="cartCount" class="cart-count">0</span></a>
     </header>
 
     <section id="newDrops" class="new-week">
-        <p class="section-eyebrow">NEW THIS WEEK</p>
+        <div class="hero-copy-wrap">
+            <p class="section-eyebrow">NEW THIS WEEK</p>
+            <h1 class="hero-title">Fresh finds. One-off pieces.<br>No restocks. Just good finds.</h1>
+            <a class="shop-cta" href="#catalog">SHOP NEW DROPS</a>
+        </div>
         <div class="editorial-frame">
             <div class="editorial-grid">
-                <div class="editorial-block large"></div>
-                <div class="editorial-block small"></div>
-                <div class="editorial-block small"></div>
+                <article id="editorialLarge" class="editorial-block large"></article>
+                <article id="editorialSmallA" class="editorial-block small"></article>
+                <article id="editorialSmallB" class="editorial-block small"></article>
             </div>
         </div>
-        <p class="editorial-copy">
-            Fresh finds. One-off pieces.<br>
-            No restocks. Just good finds.
-        </p>
-        <a class="shop-cta" href="#justIn">SHOP NEW DROPS</a>
     </section>
 
-    <div class="divider"></div>
+    <section id="catalog" class="catalog-wrap" aria-live="polite">
+        <div class="toolbar-card">
+            <div class="toolbar-head">
+                <h2 class="section-title">JUST IN</h2>
+                <p id="resultsMeta" class="results-meta">Loading products...</p>
+            </div>
 
-    <section id="justIn" class="just-in" aria-live="polite">
-        <h2 class="section-heading">JUST IN</h2>
+            <div class="toolbar-grid">
+                <label class="field-block field-search">
+                    <span>Search</span>
+                    <input id="searchInput" type="text" placeholder="Search by name, style, or SKU">
+                </label>
+
+                <label class="field-block">
+                    <span>Category</span>
+                    <select id="categorySelect">
+                        <option value="">All</option>
+                    </select>
+                </label>
+
+                <label class="field-block">
+                    <span>Sort</span>
+                    <select id="sortSelect">
+                        <option value="latest">Newest</option>
+                        <option value="price_asc">Price low-high</option>
+                        <option value="price_desc">Price high-low</option>
+                    </select>
+                </label>
+
+                <label class="stock-filter">
+                    <input id="availabilityToggle" type="checkbox">
+                    <span>In stock only</span>
+                </label>
+            </div>
+        </div>
+
         <div id="loadingState" class="state-card">Loading fresh pieces...</div>
         <div id="errorState" class="state-card hidden">Unable to load products right now. Please refresh.</div>
         <div id="emptyState" class="state-card hidden">No products are available yet.</div>
         <div id="productGrid" class="discovery-grid"></div>
+
+        <div class="catalog-footer">
+            <button id="loadMoreButton" type="button" class="ghost-btn">Load More</button>
+        </div>
     </section>
 
-    <div class="divider"></div>
-
-    <section class="categories">
-        <h2 class="section-heading">SHOP BY CATEGORY</h2>
+    <section class="categories" id="categories">
+        <h2 class="section-title">SHOP BY CATEGORY</h2>
         <div id="categoryGrid" class="category-grid"></div>
     </section>
 
-    <div class="divider"></div>
-
     <section id="about" class="why-section">
-        <h2 class="section-heading">WHY THRIFTMARKET</h2>
+        <h2 class="section-title">WHY THRIFTMARKET</h2>
         <p>Curated finds</p>
         <p class="dot">•</p>
         <p>Honest condition</p>
         <p class="dot">•</p>
         <p>Secure checkout</p>
     </section>
-
-    <p id="cartNotice" class="cart-notice">Cart preview is active. Full checkout flow comes next in Phase D2.</p>
 </div>
 </body>
 </html>
