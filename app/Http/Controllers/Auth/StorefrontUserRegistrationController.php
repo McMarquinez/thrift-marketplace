@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\View\View;
+
+class StorefrontUserRegistrationController extends Controller
+{
+    public function create(Request $request): View
+    {
+        return view('auth.register', [
+            'redirect' => $request->query('redirect', ''),
+        ]);
+    }
+
+    public function store(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'confirmed', Password::min(8)],
+            'redirect' => ['nullable', 'string'],
+        ]);
+
+        $user = User::query()->create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => $validated['password'],
+        ]);
+
+        event(new Registered($user));
+        Auth::login($user);
+        $request->session()->regenerate();
+
+        $redirect = $validated['redirect'] ?? '';
+        if (is_string($redirect) && str_starts_with($redirect, '/') && ! str_starts_with($redirect, '//')) {
+            return redirect()->to($redirect);
+        }
+
+        return redirect()->intended(route('storefront.home', absolute: false));
+    }
+}

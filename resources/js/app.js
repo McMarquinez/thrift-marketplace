@@ -23,6 +23,8 @@ const saveCartStorage = (cart) => {
     localStorage.setItem('tm_cart', JSON.stringify(cart));
 };
 
+const getCsrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
 const getImagePath = (product) => {
     const rawPath = product?.primary_image?.path || product?.images?.[0]?.path || '';
     if (!rawPath) return '';
@@ -37,7 +39,32 @@ const cartPage = document.getElementById('cartPage');
 const confirmationPage = document.getElementById('confirmationPage');
 const trackOrderPage = document.getElementById('trackOrderPage');
 
+const initPasswordToggles = () => {
+    document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const selector = button.getAttribute('data-toggle-password');
+            if (!selector) return;
+
+            const input = document.querySelector(selector);
+            if (!(input instanceof HTMLInputElement)) return;
+
+            const showLabel = button.getAttribute('data-label-show') || 'Show';
+            const hideLabel = button.getAttribute('data-label-hide') || 'Hide';
+            const isPassword = input.type === 'password';
+
+            input.type = isPassword ? 'text' : 'password';
+            button.textContent = isPassword ? hideLabel : showLabel;
+            button.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+        });
+    });
+};
+
+initPasswordToggles();
+
 if (storefrontApp) {
+    const isAuthenticated = storefrontApp.dataset.authenticated === '1';
+    const loginUrl = storefrontApp.dataset.loginUrl || '/login';
+
     const state = {
         products: [],
         categories: [],
@@ -203,6 +230,12 @@ if (storefrontApp) {
     };
 
     const addToCart = (productId) => {
+        if (!isAuthenticated) {
+            const redirect = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+            window.location.href = `${loginUrl}?redirect=${encodeURIComponent(redirect)}`;
+            return;
+        }
+
         const product = state.products.find((item) => Number(item.id) === Number(productId));
         if (!product) return;
 
@@ -499,11 +532,12 @@ if (cartPage) {
         setSubmitting(true);
 
         try {
-            const response = await fetch('/api/orders', {
+            const response = await fetch('/checkout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken(),
                 },
                 body: JSON.stringify(payload),
             });
