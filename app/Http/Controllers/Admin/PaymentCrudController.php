@@ -39,6 +39,14 @@ class PaymentCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        $orderId = request()->query('order_id');
+        if (! empty($orderId)) {
+            CRUD::addClause('where', 'order_id', (int) $orderId);
+        }
+
+        CRUD::addClause('orderByRaw', "CASE WHEN status = 'pending' THEN 0 ELSE 1 END");
+        CRUD::addClause('orderBy', 'created_at', 'desc');
+
         CRUD::addColumn([
             'name' => 'order_id',
             'label' => 'Order',

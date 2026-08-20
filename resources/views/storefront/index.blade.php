@@ -23,6 +23,7 @@
             <a href="#catalog">Shop</a>
             <a href="#newDrops">New Drops</a>
             <a href="#about">About</a>
+            <a href="{{ route('storefront.track') }}">Track Order</a>
         </nav>
         <a class="cart-link" href="{{ route('storefront.cart') }}">Cart <span id="cartCount" class="cart-count">0</span></a>
     </header>

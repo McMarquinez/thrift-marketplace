@@ -21,6 +21,7 @@ Route::group([
     Route::crud('product', 'ProductCrudController');
     Route::crud('customer', 'CustomerCrudController');
     Route::crud('order', 'OrderCrudController');
+    Route::post('order/{id}/mark-paid', 'OrderCrudController@markPaid')->name('admin.order.markPaid');
     Route::crud('payment', 'PaymentCrudController');
     Route::crud('shipment', 'ShipmentCrudController');
     Route::crud('setting', 'SettingCrudController');

@@ -226,8 +226,8 @@ Use this section as the live sprint tracker.
 - [x] F1 Public product APIs complete
 - [x] F2 Checkout/tracking/payment APIs complete
 - [x] D1 Storefront browse flow complete
-- [ ] D2 Storefront checkout flow complete
-- [ ] G1 Tests complete
+- [x] D2 Storefront checkout flow complete
+- [x] G1 Tests complete
 - [ ] Release smoke test complete
 
 ---

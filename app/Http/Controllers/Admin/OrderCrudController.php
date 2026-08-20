@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exceptions\InsufficientStockException;
 use App\Http\Requests\OrderRequest;
+use App\Models\Order;
+use App\Models\Payment;
+use App\Services\OrderService;
+use Prologue\Alerts\Facades\Alert;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Http\RedirectResponse;
 
 /**
  * Class OrderCrudController
@@ -39,6 +45,11 @@ class OrderCrudController extends CrudController
      */
     protected function setupListOperation()
     {
+        CRUD::addClause('orderBy', 'created_at', 'desc');
+
+        CRUD::addButtonFromView('line', 'mark_paid', 'order_mark_paid', 'beginning');
+        CRUD::addButtonFromView('line', 'open_payment', 'order_open_payment', 'beginning');
+
         CRUD::column('order_number');
         CRUD::column('customer_name')->label('Customer');
         CRUD::column('total')->type('number')->prefix('PHP ')->decimals(2);
@@ -111,5 +122,33 @@ class OrderCrudController extends CrudController
     protected function setupUpdateOperation()
     {
         $this->setupCreateOperation();
+    }
+
+    public function markPaid(int $id): RedirectResponse
+    {
+        $order = Order::query()->with('payments')->findOrFail($id);
+        $latestPayment = $order->payments()->latest('id')->first();
+
+        $payload = [
+            'status' => Payment::STATUS_PAID,
+            'reference_number' => $latestPayment?->reference_number,
+            'provider' => $latestPayment?->provider ?? 'manual_admin',
+            'method' => $latestPayment?->method ?? 'gcash',
+            'amount' => $latestPayment?->amount ?? (float) $order->total,
+            'metadata' => [
+                'source' => 'admin_quick_mark_paid',
+            ],
+        ];
+
+        try {
+            app(OrderService::class)->applyPaymentUpdate($order, $payload);
+            Alert::success('Order payment marked as paid. Stock finalized and order status updated.')->flash();
+        } catch (InsufficientStockException $exception) {
+            Alert::error('Unable to mark as paid: ' . $exception->getMessage())->flash();
+        } catch (\Throwable $exception) {
+            Alert::error('Unable to mark as paid right now. Please try again.')->flash();
+        }
+
+        return redirect()->back();
     }
 }

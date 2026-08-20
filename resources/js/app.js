@@ -34,6 +34,8 @@ const getImagePath = (product) => {
 
 const storefrontApp = document.getElementById('storefrontApp');
 const cartPage = document.getElementById('cartPage');
+const confirmationPage = document.getElementById('confirmationPage');
+const trackOrderPage = document.getElementById('trackOrderPage');
 
 if (storefrontApp) {
     const state = {
@@ -341,6 +343,7 @@ if (storefrontApp) {
 if (cartPage) {
     const state = {
         cart: getCartStorage(),
+        submitting: false,
     };
 
     const refs = {
@@ -349,8 +352,35 @@ if (cartPage) {
         cartEmptyState: document.getElementById('cartEmptyState'),
         summaryItems: document.getElementById('summaryItems'),
         summarySubtotal: document.getElementById('summarySubtotal'),
+        checkoutForm: document.getElementById('checkoutForm'),
+        checkoutStatus: document.getElementById('checkoutStatus'),
+        checkoutName: document.getElementById('checkoutName'),
+        checkoutEmail: document.getElementById('checkoutEmail'),
+        checkoutPhone: document.getElementById('checkoutPhone'),
+        checkoutAddress: document.getElementById('checkoutAddress'),
+        checkoutPaymentMethod: document.getElementById('checkoutPaymentMethod'),
+        checkoutReference: document.getElementById('checkoutReference'),
+        checkoutNotes: document.getElementById('checkoutNotes'),
         checkoutButton: document.getElementById('checkoutButton'),
         clearCartButton: document.getElementById('clearCartButton'),
+    };
+
+    const setCheckoutStatus = (message, type) => {
+        refs.checkoutStatus.textContent = message;
+        refs.checkoutStatus.classList.remove('hidden', 'success', 'error');
+        refs.checkoutStatus.classList.add(type);
+    };
+
+    const clearCheckoutStatus = () => {
+        refs.checkoutStatus.textContent = '';
+        refs.checkoutStatus.classList.add('hidden');
+        refs.checkoutStatus.classList.remove('success', 'error');
+    };
+
+    const setSubmitting = (isSubmitting) => {
+        state.submitting = isSubmitting;
+        refs.checkoutButton.disabled = isSubmitting || state.cart.length === 0;
+        refs.checkoutButton.textContent = isSubmitting ? 'Placing Order...' : 'Place Order';
     };
 
     const updateHeaderCount = () => {
@@ -364,7 +394,7 @@ if (cartPage) {
 
         refs.summaryItems.textContent = String(totalItems);
         refs.summarySubtotal.textContent = formatMoney(subtotal);
-        refs.checkoutButton.disabled = totalItems === 0;
+        refs.checkoutButton.disabled = totalItems === 0 || state.submitting;
 
         refs.cartEmptyState.classList.toggle('hidden', totalItems > 0);
 
@@ -436,8 +466,194 @@ if (cartPage) {
 
     refs.clearCartButton.addEventListener('click', () => {
         state.cart = [];
+        clearCheckoutStatus();
         persist();
     });
 
+    refs.checkoutForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (state.cart.length === 0 || state.submitting) {
+            return;
+        }
+
+        const mergedNotes = [
+            refs.checkoutNotes.value.trim(),
+            refs.checkoutReference.value.trim() ? `GCash Ref: ${refs.checkoutReference.value.trim()}` : '',
+        ].filter(Boolean).join(' | ');
+
+        const payload = {
+            customer_name: refs.checkoutName.value.trim(),
+            customer_email: refs.checkoutEmail.value.trim(),
+            customer_phone: refs.checkoutPhone.value.trim() || null,
+            shipping_address: refs.checkoutAddress.value.trim(),
+            payment_method: refs.checkoutPaymentMethod.value,
+            notes: mergedNotes || null,
+            items: state.cart.map((item) => ({
+                product_id: Number(item.product_id),
+                quantity: Number(item.quantity),
+            })),
+        };
+
+        clearCheckoutStatus();
+        setSubmitting(true);
+
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const json = await response.json();
+
+            if (!response.ok) {
+                const validationErrors = json.errors
+                    ? Object.values(json.errors).flat().join(' ')
+                    : '';
+                const fallbackError = json.error || json.message || 'Unable to place order right now.';
+                setCheckoutStatus(validationErrors || fallbackError, 'error');
+                return;
+            }
+
+            const orderNumber = json?.data?.order_number || 'N/A';
+            const total = json?.data?.pricing?.total;
+            const successMessage = total !== undefined
+                ? `Order ${orderNumber} placed successfully. Total: ${formatMoney(total)}.`
+                : `Order ${orderNumber} placed successfully.`;
+
+            setCheckoutStatus(successMessage, 'success');
+
+            const emailParam = encodeURIComponent(payload.customer_email);
+            const orderParam = encodeURIComponent(orderNumber);
+
+            state.cart = [];
+            persist();
+            refs.checkoutForm.reset();
+
+            window.location.href = `/order-confirmation?order_number=${orderParam}&email=${emailParam}`;
+        } catch {
+            setCheckoutStatus('Network error while placing order. Please try again.', 'error');
+        } finally {
+            setSubmitting(false);
+        }
+    });
+
     renderCart();
+}
+
+if (confirmationPage) {
+    const cartCount = document.getElementById('cartCount');
+    const confirmationMeta = document.getElementById('confirmationMeta');
+    const confirmationSummary = document.getElementById('confirmationSummary');
+    const trackOrderButton = document.getElementById('trackOrderButton');
+
+    const cart = getCartStorage();
+    const count = cart.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    cartCount.textContent = String(count);
+
+    const params = new URLSearchParams(window.location.search);
+    const orderNumber = params.get('order_number') || '';
+    const email = params.get('email') || '';
+
+    if (!orderNumber || !email) {
+        confirmationMeta.textContent = 'Order details are missing. You can still track your order anytime.';
+        confirmationSummary.textContent = 'Use the Track Order page with your order number and checkout email.';
+    } else {
+        confirmationMeta.textContent = `Order ${orderNumber} is now pending payment confirmation.`;
+        confirmationSummary.textContent = `Saved to order email: ${email}`;
+        trackOrderButton.href = `/track-order?order_number=${encodeURIComponent(orderNumber)}&email=${encodeURIComponent(email)}`;
+    }
+}
+
+if (trackOrderPage) {
+    const cartCount = document.getElementById('cartCount');
+    const trackOrderForm = document.getElementById('trackOrderForm');
+    const trackOrderNumber = document.getElementById('trackOrderNumber');
+    const trackEmail = document.getElementById('trackEmail');
+    const trackStatus = document.getElementById('trackStatus');
+    const trackResult = document.getElementById('trackResult');
+    const trackSubmitButton = document.getElementById('trackSubmitButton');
+
+    const cart = getCartStorage();
+    const count = cart.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    cartCount.textContent = String(count);
+
+    const setTrackStatus = (message, type) => {
+        trackStatus.textContent = message;
+        trackStatus.classList.remove('hidden', 'success', 'error');
+        trackStatus.classList.add(type);
+    };
+
+    const clearTrackStatus = () => {
+        trackStatus.textContent = '';
+        trackStatus.classList.add('hidden');
+        trackStatus.classList.remove('success', 'error');
+    };
+
+    const renderTracking = (data) => {
+        const createdAt = data.created_at ? new Date(data.created_at).toLocaleString() : 'N/A';
+        const paidAt = data.paid_at ? new Date(data.paid_at).toLocaleString() : 'Not yet paid';
+
+        trackResult.innerHTML = `
+            <div class="track-result-grid">
+                <p><strong>Order Number:</strong> ${data.order_number || 'N/A'}</p>
+                <p><strong>Order Status:</strong> ${data.status || 'N/A'}</p>
+                <p><strong>Payment Status:</strong> ${data.payment_status || 'N/A'}</p>
+                <p><strong>Shipping Status:</strong> ${data.shipping_status || 'N/A'}</p>
+                <p><strong>Total:</strong> ${formatMoney(data.pricing?.total)}</p>
+                <p><strong>Created:</strong> ${createdAt}</p>
+                <p><strong>Paid:</strong> ${paidAt}</p>
+            </div>
+        `;
+        trackResult.classList.remove('hidden');
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const presetOrder = params.get('order_number');
+    const presetEmail = params.get('email');
+    if (presetOrder) trackOrderNumber.value = presetOrder;
+    if (presetEmail) trackEmail.value = presetEmail;
+
+    trackOrderForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        clearTrackStatus();
+        trackResult.classList.add('hidden');
+
+        trackSubmitButton.disabled = true;
+        trackSubmitButton.textContent = 'Checking...';
+
+        try {
+            const response = await fetch('/api/orders/track', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                },
+                body: JSON.stringify({
+                    order_number: trackOrderNumber.value.trim(),
+                    email: trackEmail.value.trim(),
+                }),
+            });
+
+            const json = await response.json();
+
+            if (!response.ok) {
+                const message = json.message || 'Order not found. Please verify details.';
+                setTrackStatus(message, 'error');
+                return;
+            }
+
+            setTrackStatus('Order found. Status updated below.', 'success');
+            renderTracking(json.data || {});
+        } catch {
+            setTrackStatus('Network error while tracking order. Please try again.', 'error');
+        } finally {
+            trackSubmitButton.disabled = false;
+            trackSubmitButton.textContent = 'Track Order';
+        }
+    });
 }
