@@ -1,59 +1,607 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Thrift Marketplace
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A modern, full-stack marketplace for selling curated thrift, secondhand, sample, surplus, and one-of-a-kind products online.
 
-## About Laravel
+> **Status:** 🚧 MVP — Active Development
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Thrift Marketplace is an e-commerce platform designed around the unique challenges of selling thrift and limited-quantity products.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Unlike traditional e-commerce stores where products can usually be restocked, thrift marketplaces often deal with:
 
-## Learning Laravel
+* One-of-a-kind items
+* Limited quantities
+* Sample products
+* Secondhand products
+* Irregular inventory
+* Frequently changing product catalogs
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+The platform is designed to make the buying process as simple as possible:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+**Browse → Add to Cart → Checkout → Pay → Track Order**
 
-## Laravel Sponsors
+while giving store administrators a simple way to manage:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+**Products → Inventory → Orders → Payments → Fulfillment**
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## ✨ Features
 
-## Contributing
+### Storefront
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* 🛍️ Product browsing
+* 🔎 Product search
+* 🏷️ Category and brand filtering
+* 📦 Stock availability
+* 🖼️ Product image galleries
+* 🛒 Shopping cart
+* 💳 Checkout
+* 📋 Order confirmation
+* 🚚 Order tracking
+* 📱 Responsive, mobile-first UI
 
-## Code of Conduct
+### Inventory
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+* Unique SKU for every product
+* Flexible stock quantities
+* Support for one-of-a-kind products
+* Support for products with multiple units
+* Stock availability calculation
+* Temporary inventory reservations
+* Automatic reservation expiration
+* Overselling protection
 
-## Security Vulnerabilities
+### Orders & Payments
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* Customer checkout
+* Order management
+* Payment status tracking
+* Payment confirmation
+* Order status workflow
+* Shipping information
+* Order tracking
 
-## License
+### Admin
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Powered by Laravel Backpack.
+
+* Dashboard
+* Product management
+* Category management
+* Brand management
+* Inventory management
+* Order management
+* Payment management
+* Customer management
+* Shipping management
+* Store settings
+
+---
+
+## 🏗️ Technology Stack
+
+### Backend
+
+* [Laravel](https://laravel.com/)
+* PHP
+* MySQL
+* Laravel Sanctum
+* Laravel Backpack
+
+### Frontend
+
+* Vue 3
+* Vuetify 3
+* Vite
+* Vue Router
+* Axios
+
+### Architecture
+
+The application uses Laravel as the central backend and source of truth.
+
+```text
+                     ┌──────────────────┐
+                     │     Customer     │
+                     └────────┬─────────┘
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │ Vue + Vuetify    │
+                    │   Storefront     │
+                    └────────┬─────────┘
+                              │
+                         REST API
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │     Laravel      │
+                    │     Backend      │
+                    └────────┬─────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+          ┌────────┐    ┌─────────┐    ┌─────────┐
+          │ MySQL  │    │ Payment │    │ Storage │
+          └────────┘    │ Gateway │    └─────────┘
+                        └─────────┘
+                              ▲
+                              │
+                    ┌─────────┴────────┐
+                    │ Laravel Backpack │
+                    │   Admin Panel     │
+                    └───────────────────┘
+```
+
+---
+
+## 📦 Inventory Model
+
+The platform does **not** assume that every product has a quantity of one.
+
+A product can have:
+
+```text
+Stock = 1
+```
+
+for a unique thrift item, or:
+
+```text
+Stock = 10
+```
+
+for a product with multiple available units.
+
+Every product receives a unique SKU.
+
+Example:
+
+```text
+TS-000001
+TS-000002
+TS-000003
+```
+
+Physical barcode or QR-code stickers are **not required**.
+
+The SKU is primarily an internal inventory identifier.
+
+---
+
+## 🔒 Inventory Reservation
+
+To prevent two customers from purchasing the same item simultaneously, inventory is temporarily reserved when an order is created.
+
+```text
+Product Available
+       │
+       ▼
+ Customer Checkout
+       │
+       ▼
+  Order Created
+       │
+       ▼
+ Inventory Reserved
+       │
+       ├───────────────┐
+       │               │
+       ▼               ▼
+ Payment Success   Payment Expires
+       │               │
+       ▼               ▼
+  Stock Finalized   Reservation
+                    Released
+```
+
+Adding an item to the cart does **not** permanently reserve inventory.
+
+The server revalidates inventory during checkout.
+
+---
+
+## 🛒 Customer Flow
+
+```text
+Homepage
+    ↓
+Shop
+    ↓
+Product Details
+    ↓
+Add to Cart
+    ↓
+Cart
+    ↓
+Checkout
+    ↓
+Customer Information
+    ↓
+Shipping Information
+    ↓
+Payment
+    ↓
+Order Confirmation
+    ↓
+Order Tracking
+```
+
+The primary goal is to minimize manual inquiries.
+
+Customers should be able to complete a purchase without needing to contact the seller for basic information.
+
+---
+
+## 📋 Order Lifecycle
+
+Orders follow a defined lifecycle:
+
+```text
+Pending Payment
+       │
+       ├──── Payment Success ────► Paid
+       │                              │
+       │                              ▼
+       │                         Processing
+       │                              │
+       │                              ▼
+       │                            Packed
+       │                              │
+       │                              ▼
+       │                           Shipped
+       │                              │
+       │                              ▼
+       │                          Completed
+       │
+       ├──── Payment Timeout ────► Expired
+       │
+       └──── Cancellation ──────► Cancelled
+```
+
+Payment and shipping statuses are tracked separately from the main order status.
+
+---
+
+## 🗃️ Core Models
+
+The MVP is built around the following models:
+
+```text
+Category
+   └── Products
+
+Brand
+   └── Products
+
+Product
+   ├── Category
+   ├── Brand
+   ├── Product Images
+   └── Order Items
+
+Customer
+   └── Orders
+
+Order
+   ├── Customer
+   ├── Order Items
+   ├── Payments
+   └── Shipment
+
+Order Item
+   ├── Order
+   └── Product
+```
+
+---
+
+## 🚀 MVP Scope
+
+### Storefront
+
+* [x] Project architecture
+* [ ] Homepage
+* [ ] Product listing
+* [ ] Product search
+* [ ] Product filtering
+* [ ] Product details
+* [ ] Shopping cart
+* [ ] Checkout
+* [ ] Order confirmation
+* [ ] Order tracking
+
+### Admin
+
+* [ ] Laravel Backpack setup
+* [ ] Product CRUD
+* [ ] Category CRUD
+* [ ] Brand CRUD
+* [ ] Product image management
+* [ ] Inventory management
+* [ ] Order management
+* [ ] Payment management
+* [ ] Customer management
+* [ ] Shipping management
+* [ ] Store settings
+
+### Backend
+
+* [ ] Database migrations
+* [ ] Models and relationships
+* [ ] Product API
+* [ ] Cart validation
+* [ ] Checkout API
+* [ ] Order creation
+* [ ] Inventory reservation
+* [ ] Payment processing
+* [ ] Reservation expiration
+* [ ] Order tracking
+* [ ] Overselling protection
+
+---
+
+## 🛠️ Local Development
+
+### Requirements
+
+Make sure the following are installed:
+
+* PHP
+* Composer
+* Node.js
+* npm
+* MySQL
+* Git
+
+### Clone the repository
+
+```bash
+git clone https://github.com/YOUR_USERNAME/thrift-marketplace.git
+
+cd thrift-marketplace
+```
+
+### Install PHP dependencies
+
+```bash
+composer install
+```
+
+### Install frontend dependencies
+
+```bash
+npm install
+```
+
+### Configure environment
+
+```bash
+cp .env.example .env
+```
+
+Configure the database in `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=thrift_marketplace
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Generate the application key:
+
+```bash
+php artisan key:generate
+```
+
+### Run migrations
+
+```bash
+php artisan migrate
+```
+
+### Start the Laravel server
+
+```bash
+php artisan serve
+```
+
+### Start Vite
+
+```bash
+npm run dev
+```
+
+The application should then be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## 🧪 Testing
+
+Run the Laravel test suite:
+
+```bash
+php artisan test
+```
+
+Before considering the MVP complete, the following scenarios should be tested:
+
+### Inventory
+
+* Product with stock of 1
+* Product with stock greater than 1
+* Product becomes unavailable
+* Inventory reservation
+* Reservation expiration
+* Inventory restoration
+* Concurrent checkout attempts
+* Overselling prevention
+
+### Checkout
+
+* Successful checkout
+* Invalid customer information
+* Invalid shipping information
+* Insufficient stock
+* Price changes before checkout
+* Empty cart
+
+### Payment
+
+* Successful payment
+* Failed payment
+* Expired payment
+* Duplicate payment callback
+* Manual payment confirmation
+
+### Orders
+
+* Pending payment
+* Paid
+* Processing
+* Packed
+* Shipped
+* Completed
+* Cancelled
+* Expired
+
+---
+
+## 🔐 Security Principles
+
+The backend is always the source of truth.
+
+The application must never trust the frontend for:
+
+* Product price
+* Inventory quantity
+* Payment status
+* Order totals
+* Customer authorization
+
+All critical operations must be validated server-side.
+
+Financial and inventory operations should use database transactions where appropriate.
+
+Payment webhooks must be verified before changing order/payment state.
+
+---
+
+## 📈 Roadmap
+
+### Phase 1 — MVP
+
+* Storefront
+* Product catalog
+* Inventory
+* Cart
+* Checkout
+* Payments
+* Orders
+* Admin panel
+* Order tracking
+
+### Phase 2 — Store Improvements
+
+* Customer accounts
+* Email notifications
+* Wishlist
+* Discount codes
+* Multiple payment methods
+* Multiple shipping methods
+* Better analytics
+
+### Phase 3 — Advanced Inventory
+
+* Barcode support
+* QR codes
+* Inventory locations
+* Stock batches
+* Cost tracking
+* Profit reporting
+
+### Phase 4 — Platform
+
+* Native mobile application
+* Push notifications
+* Loyalty system
+* Product recommendations
+* Advanced analytics
+
+---
+
+## 🤝 Contributing
+
+Contributions, suggestions, and improvements are welcome.
+
+Before making significant changes, please open an issue to discuss the proposed feature or architectural change.
+
+When contributing:
+
+1. Keep changes focused.
+2. Follow existing Laravel and Vue patterns.
+3. Add tests for important business logic.
+4. Avoid unnecessary dependencies.
+5. Do not introduce features outside the current roadmap without discussion.
+
+---
+
+## 📄 Project Documentation
+
+The complete MVP specification and development instructions are maintained in:
+
+```text
+PROJECT.md
+```
+
+`PROJECT.md` serves as the project's **Single Source of Truth (SSOT)**.
+
+It contains:
+
+* Product requirements
+* Business rules
+* Architecture
+* Database models
+* Inventory workflows
+* Checkout workflows
+* Payment workflows
+* Admin modules
+* Storefront modules
+* API requirements
+* Development milestones
+* Acceptance criteria
+
+---
+
+## 📜 License
+
+This project is currently under development.
+
+The licensing model will be determined before the first public release.
+
+---
+
+## 💡 Project Goal
+
+Thrift Marketplace is being built around a simple idea:
+
+> **Make selling unique and limited-quantity products online as easy as selling regular e-commerce inventory.**
+
+The customer experience should be:
+
+**Discover → Choose → Checkout → Pay → Receive**
+
+The business experience should be:
+
+**List → Track → Sell → Fulfill**
+
+Everything else should support those two experiences.

@@ -220,12 +220,12 @@ Use this section as the live sprint tracker.
 - [x] B1 Schema complete
 - [x] C1 Admin catalog complete
 - [x] C2 Admin operations complete
-- [ ] E1 Order transaction flow complete
-- [ ] E2 Inventory reservation/expiration complete
-- [ ] E3 Payment confirmation/idempotency complete
+- [x] E1 Order transaction flow complete
+- [x] E2 Inventory reservation/expiration complete
+- [x] E3 Payment confirmation/idempotency complete
 - [x] F1 Public product APIs complete
-- [ ] F2 Checkout/tracking/payment APIs complete
-- [ ] D1 Storefront browse flow complete
+- [x] F2 Checkout/tracking/payment APIs complete
+- [x] D1 Storefront browse flow complete
 - [ ] D2 Storefront checkout flow complete
 - [ ] G1 Tests complete
 - [ ] Release smoke test complete
