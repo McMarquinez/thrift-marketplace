@@ -11,25 +11,13 @@
 </head>
 <body class="storefront-body">
 <div id="confirmationPage" class="storefront-shell">
-    <header class="site-navbar">
-        <a href="{{ route('storefront.home') }}" class="brand-block">
-            <span class="brand-mark">TM</span>
-            <div>
-                <p class="brand-title">THRIFTMARKET</p>
-                <p class="brand-sub">Curated thrift discovery</p>
-            </div>
-        </a>
-        <nav class="navbar-links" aria-label="Main navigation">
-            <a href="{{ route('storefront.home') }}#catalog">Shop</a>
-            <a href="{{ route('storefront.home') }}#newDrops">New Drops</a>
-            <a href="{{ route('storefront.home') }}#about">About</a>
-            <a href="{{ route('storefront.track') }}">Track Order</a>
-        </nav>
-        <a class="cart-link" href="{{ route('storefront.cart') }}">Cart <span id="cartCount" class="cart-count">0</span></a>
-    </header>
+    @include('storefront.partials.nav')
 
     <section class="single-panel-wrap">
         <article class="single-panel">
+            <div class="confirmation-check" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
             <p class="section-eyebrow">ORDER RECEIVED</p>
             <h1 class="hero-title">Thanks. Your order is in.</h1>
             <p id="confirmationMeta" class="section-subtitle">Your order is pending manual GCash verification.</p>
@@ -53,6 +41,8 @@
             </div>
         </article>
     </section>
+
+    @include('storefront.partials.footer')
 </div>
 </body>
 </html>

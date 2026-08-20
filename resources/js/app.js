@@ -91,7 +91,6 @@ if (storefrontApp) {
 
     const refs = {
         cartCount: document.getElementById('cartCount'),
-        loadingState: document.getElementById('loadingState'),
         errorState: document.getElementById('errorState'),
         emptyState: document.getElementById('emptyState'),
         productGrid: document.getElementById('productGrid'),
@@ -102,17 +101,35 @@ if (storefrontApp) {
         availabilityToggle: document.getElementById('availabilityToggle'),
         resultsMeta: document.getElementById('resultsMeta'),
         loadMoreButton: document.getElementById('loadMoreButton'),
+        retryLoadButton: document.getElementById('retryLoadButton'),
+        resetFiltersButton: document.getElementById('resetFiltersButton'),
         editorialLarge: document.getElementById('editorialLarge'),
         editorialSmallA: document.getElementById('editorialSmallA'),
         editorialSmallB: document.getElementById('editorialSmallB'),
     };
 
+    const skeletonCard = () => `
+        <div class="discovery-card discovery-skeleton" aria-hidden="true">
+            <div class="discovery-image skeleton-block"></div>
+            <div class="discovery-content">
+                <span class="skeleton-line skeleton-line-sm"></span>
+                <span class="skeleton-line skeleton-line-lg"></span>
+                <span class="skeleton-line skeleton-line-md"></span>
+            </div>
+        </div>
+    `;
+
     let searchDebounce;
 
-    const setLoading = (isLoading) => {
+    const setLoading = (isLoading, { append = false } = {}) => {
         state.loading = isLoading;
-        refs.loadingState.classList.toggle('hidden', !isLoading);
         refs.loadMoreButton.disabled = isLoading;
+
+        if (isLoading && !append) {
+            refs.emptyState.classList.add('hidden');
+            refs.errorState.classList.add('hidden');
+            refs.productGrid.innerHTML = Array.from({ length: 8 }, skeletonCard).join('');
+        }
     };
 
     const setError = (isError) => {
@@ -262,7 +279,7 @@ if (storefrontApp) {
     };
 
     const loadProducts = async ({ append = false } = {}) => {
-        setLoading(true);
+        setLoading(true, { append });
         setError(false);
 
         try {
@@ -361,6 +378,21 @@ if (storefrontApp) {
         addToCart(Number(button.getAttribute('data-add-to-cart')));
     });
 
+    refs.retryLoadButton.addEventListener('click', () => {
+        loadProducts({ append: false });
+    });
+
+    refs.resetFiltersButton.addEventListener('click', () => {
+        state.query.search = '';
+        state.query.categoryId = '';
+        state.query.availableOnly = false;
+        refs.searchInput.value = '';
+        refs.categorySelect.value = '';
+        refs.availabilityToggle.checked = false;
+        renderCategories();
+        resetAndLoadProducts();
+    });
+
     (async () => {
         updateCartCount();
 
@@ -383,8 +415,10 @@ if (cartPage) {
         cartCount: document.getElementById('cartCount'),
         cartItems: document.getElementById('cartItems'),
         cartEmptyState: document.getElementById('cartEmptyState'),
+        cartItemCountLabel: document.getElementById('cartItemCountLabel'),
         summaryItems: document.getElementById('summaryItems'),
         summarySubtotal: document.getElementById('summarySubtotal'),
+        summaryTotal: document.getElementById('summaryTotal'),
         checkoutForm: document.getElementById('checkoutForm'),
         checkoutStatus: document.getElementById('checkoutStatus'),
         checkoutName: document.getElementById('checkoutName'),
@@ -427,6 +461,8 @@ if (cartPage) {
 
         refs.summaryItems.textContent = String(totalItems);
         refs.summarySubtotal.textContent = formatMoney(subtotal);
+        refs.summaryTotal.textContent = formatMoney(subtotal);
+        refs.cartItemCountLabel.textContent = totalItems > 0 ? `${totalItems} item${totalItems === 1 ? '' : 's'}` : '';
         refs.checkoutButton.disabled = totalItems === 0 || state.submitting;
 
         refs.cartEmptyState.classList.toggle('hidden', totalItems > 0);

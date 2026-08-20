@@ -60,7 +60,10 @@
                 </label>
 
                 <label class="form-field" for="password">
-                    <span>Password</span>
+                    <span class="form-field-label-row">
+                        <span>Password</span>
+                        <a href="{{ route('password.request') }}" class="auth-inline-link auth-forgot-link">Forgot password?</a>
+                    </span>
                     <span class="password-field">
                         <input id="password" name="password" type="password" autocomplete="current-password" required>
                         <button type="button" class="password-toggle" data-toggle-password="#password" data-label-show="Show" data-label-hide="Hide" aria-label="Toggle password visibility">Show</button>

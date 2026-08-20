@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\StorefrontPasswordResetController;
 use App\Http\Controllers\Auth\StorefrontSessionController;
 use App\Http\Controllers\Auth\StorefrontUserRegistrationController;
 use App\Http\Controllers\StorefrontCheckoutController;
@@ -27,6 +28,11 @@ Route::middleware('guest')->group(function (): void {
     Route::post('/login', [StorefrontSessionController::class, 'store'])->name('login.store');
     Route::get('/register', [StorefrontUserRegistrationController::class, 'create'])->name('register');
     Route::post('/register', [StorefrontUserRegistrationController::class, 'store'])->name('register.store');
+
+    Route::get('/forgot-password', [StorefrontPasswordResetController::class, 'create'])->name('password.request');
+    Route::post('/forgot-password', [StorefrontPasswordResetController::class, 'store'])->name('password.email');
+    Route::get('/reset-password/{token}', [StorefrontPasswordResetController::class, 'edit'])->name('password.reset');
+    Route::post('/reset-password', [StorefrontPasswordResetController::class, 'update'])->name('password.update');
 });
 
 Route::post('/logout', [StorefrontSessionController::class, 'destroy'])

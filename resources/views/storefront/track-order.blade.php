@@ -11,22 +11,7 @@
 </head>
 <body class="storefront-body">
 <div id="trackOrderPage" class="storefront-shell">
-    <header class="site-navbar">
-        <a href="{{ route('storefront.home') }}" class="brand-block">
-            <span class="brand-mark">TM</span>
-            <div>
-                <p class="brand-title">THRIFTMARKET</p>
-                <p class="brand-sub">Curated thrift discovery</p>
-            </div>
-        </a>
-        <nav class="navbar-links" aria-label="Main navigation">
-            <a href="{{ route('storefront.home') }}#catalog">Shop</a>
-            <a href="{{ route('storefront.home') }}#newDrops">New Drops</a>
-            <a href="{{ route('storefront.home') }}#about">About</a>
-            <a href="{{ route('storefront.track') }}">Track Order</a>
-        </nav>
-        <a class="cart-link" href="{{ route('storefront.cart') }}">Cart <span id="cartCount" class="cart-count">0</span></a>
-    </header>
+    @include('storefront.partials.nav')
 
     <section class="single-panel-wrap">
         <article class="single-panel">
@@ -53,6 +38,8 @@
             <div id="trackResult" class="state-card hidden"></div>
         </article>
     </section>
+
+    @include('storefront.partials.footer')
 </div>
 </body>
 </html>

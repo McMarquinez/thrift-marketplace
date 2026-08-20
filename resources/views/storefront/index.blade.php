@@ -11,34 +11,29 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="storefront-body">
+<a href="#catalog" class="skip-link">Skip to product listing</a>
 <div
     id="storefrontApp"
     class="storefront-shell"
     data-authenticated="{{ auth()->check() ? '1' : '0' }}"
     data-login-url="{{ route('login') }}"
 >
-    <header class="site-navbar">
-        <a href="{{ route('storefront.home') }}" class="brand-block">
-            <span class="brand-mark">TM</span>
-            <div>
-                <p class="brand-title">THRIFTMARKET</p>
-                <p class="brand-sub">Curated thrift discovery</p>
-            </div>
-        </a>
-        <nav class="navbar-links" aria-label="Main navigation">
-            <a href="#catalog">Shop</a>
-            <a href="#newDrops">New Drops</a>
-            <a href="#about">About</a>
-            <a href="{{ route('storefront.track') }}">Track Order</a>
-        </nav>
-        <a class="cart-link" href="{{ route('storefront.cart') }}">Cart <span id="cartCount" class="cart-count">0</span></a>
-    </header>
+    @include('storefront.partials.nav')
 
     <section id="newDrops" class="new-week">
         <div class="hero-copy-wrap">
             <p class="section-eyebrow">NEW THIS WEEK</p>
             <h1 class="hero-title">Fresh finds. One-off pieces.<br>No restocks. Just good finds.</h1>
-            <a class="shop-cta" href="#catalog">SHOP NEW DROPS</a>
+            <p class="hero-support">Every item is checked for condition and photographed as-is — what you see is exactly what arrives.</p>
+            <div class="hero-actions">
+                <a class="shop-cta" href="#catalog">SHOP NEW DROPS</a>
+                <a class="shop-cta-secondary" href="#categories">Browse categories</a>
+            </div>
+            <ul class="hero-trust-row">
+                <li>Honest condition notes</li>
+                <li>Secure checkout</li>
+                <li>Payments verified by hand</li>
+            </ul>
         </div>
         <div class="editorial-frame">
             <div class="editorial-grid">
@@ -59,7 +54,10 @@
             <div class="toolbar-grid">
                 <label class="field-block field-search">
                     <span>Search</span>
-                    <input id="searchInput" type="text" placeholder="Search by name, style, or SKU">
+                    <span class="input-with-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                        <input id="searchInput" type="text" placeholder="Search by name, style, or SKU">
+                    </span>
                 </label>
 
                 <label class="field-block">
@@ -85,9 +83,14 @@
             </div>
         </div>
 
-        <div id="loadingState" class="state-card">Loading fresh pieces...</div>
-        <div id="errorState" class="state-card hidden">Unable to load products right now. Please refresh.</div>
-        <div id="emptyState" class="state-card hidden">No products are available yet.</div>
+        <div id="errorState" class="state-card state-card-notice hidden">
+            <span>Unable to load products right now.</span>
+            <button id="retryLoadButton" type="button" class="ghost-btn">Try Again</button>
+        </div>
+        <div id="emptyState" class="state-card state-card-notice hidden">
+            <span>No products match your filters.</span>
+            <button id="resetFiltersButton" type="button" class="ghost-btn">Reset Filters</button>
+        </div>
         <div id="productGrid" class="discovery-grid"></div>
 
         <div class="catalog-footer">
@@ -108,6 +111,8 @@
         <p class="dot">•</p>
         <p>Secure checkout</p>
     </section>
+
+    @include('storefront.partials.footer')
 </div>
 </body>
 </html>
